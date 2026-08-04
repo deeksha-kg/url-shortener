@@ -8,3 +8,4 @@ Learning project using:
 - PostgreSQL
 - Redis
 - Kubernetes
+Building this project to learn
