@@ -1,0 +1,31 @@
+services:
+
+  app:
+    build: .
+    container_name: url-shortener-app
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://urluser:urlpassword@postgres:5432/urlshortener
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: url-shortener-db
+    environment:
+      POSTGRES_USER: urluser
+      POSTGRES_PASSWORD: urlpassword
+      POSTGRES_DB: urlshortener
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U urluser -d urlshortener"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

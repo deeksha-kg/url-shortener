@@ -13,5 +13,8 @@ def create_short_url(original_url:str):
     }
 
 def get_original_url(short_code:str):
-    return get(short_code)
+    url=get(short_code)
+    if url is None:
+        return None
+    return url.original_url#because over here the url will be a URL object defined by the URL model
 

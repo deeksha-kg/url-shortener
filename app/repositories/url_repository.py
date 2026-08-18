@@ -1,12 +1,37 @@
-url_db={}
+from sqlalchemy import select
+from app.database import DATABASE_URL,SessionLocal
+from app.models import URL
 
 def save(short_code: str,original_url: str):
-    url_db[short_code]=original_url
+    db=SessionLocal()
+    try:
+        url=URL(
+            short_code=short_code,
+            original_url=original_url
+        )
+        db.add(url)
+        db.commit()
+    finally:
+        db.close()
+ 
 
 def get(short_code: str):
-    return url_db.get(short_code)
+    db=SessionLocal()
+    try:
+        statement=select(URL).where(URL.short_code==short_code)
+        result=db.execute(statement)
+        return result.scalar_one_or_none()
+    finally:
+        db.close()
+
 
 def exists(short_code: str):
-    return short_code in url_db
+    db=SessionLocal()
+    try:
+        statement=select(URL).where(URL.short_code==short_code)
+        result=db.execute(statement)
+        return result.scalar_one_or_none() is not None
+    finally:
+        db.close()
 
-    
+
