@@ -1,0 +1,49 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-shortener-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: url-shortener-app
+  template:
+    metadata:
+      labels:
+        app: url-shortener-app
+    spec:
+      containers:
+        - name: backend
+          image: url-shortener-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: "postgresql+psycopg2://urluser:urlpassword@postgres:5432/urlshortener"
+            - name: REDIS_URL
+              value: "redis://redis:6379"
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-shortener-app
+spec:
+  selector:
+    app: url-shortener-app
+  ports:
+    - port: 8000
+      targetPort: 8000

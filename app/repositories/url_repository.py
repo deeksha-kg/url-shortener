@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.database import DATABASE_URL,SessionLocal
+from app.database import SessionLocal
 from app.models import URL
 
 def save(short_code: str,original_url: str):
@@ -34,4 +34,18 @@ def exists(short_code: str):
     finally:
         db.close()
 
+def get_by_original_url(original_url: str):
 
+    db = SessionLocal()
+
+    try:
+        statement = select(URL).where(
+            URL.original_url == original_url
+        )
+
+        result = db.execute(statement)
+
+        return result.scalar_one_or_none()
+
+    finally:
+        db.close()
